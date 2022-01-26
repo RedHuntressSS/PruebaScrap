@@ -18,7 +18,7 @@ def scrapPagina(url, marca):
 def scrapPaginas(url, marca, num):
     Totales=[]
     for i in range(num):
-        print(url)
+        #print(url)
         Totales.append(scrapPagina(url, marca))
         p=requests.get(url)
         p.status_code
@@ -27,5 +27,10 @@ def scrapPaginas(url, marca, num):
         url=s1.a.get('href')
     return Totales
 
-Totales=scrapPaginas('https://listado.mercadolibre.com.ar/celular-smarphones#D[A:celular%20smarphones]', 'samsung', 5)
-print(Totales)
+
+url='https://listado.mercadolibre.com.ar/celular-smarphones#D[A:celular%20smarphones]'
+marca='Samsung'
+paginas=5
+Totales=scrapPaginas(url, marca, paginas)
+#print(Totales)
+print("La cantidad de productos encontrados de la marca ", marca, " que están en el Fulfillment, en los resultados de las ", paginas, " primeras paginas es: ", sum(Totales))
