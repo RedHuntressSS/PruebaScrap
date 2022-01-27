@@ -60,13 +60,13 @@ Now you can see all the products in your database:
 terminal
 ```
 mysql -u root -p
-*enter password*
+Enter password:
 use productos_prueba;
 select * from productos; 
 ```
 or this to better see the results:
 ```
-select Titulo Titulo, Precio, Reviews from productos; //to better see the results 
+select Titulo, Precio, Reviews from productos; //to better see the results;
 ```
 Example of result:
 
