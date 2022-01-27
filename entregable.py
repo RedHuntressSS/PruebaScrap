@@ -1,9 +1,15 @@
 #Scrapper de las 5 primeras páginas de la búsqueda.
+#Almacenar los productos normalizados en una tabla de base de datos relacional a preferencia del desarrollador
 
 from bs4 import BeautifulSoup
 import requests
 
+productos=[]
+
 def scrapPagina(url, marca):
+    #función que realiza el scrap de la url indicada en busqueda de los articulos de la marca especificada que estan en Fulfillment
+    #Retorna el numero de productos encontrados y los almacena en la lista productos
+
     p=requests.get(url)
     p.status_code
     s= BeautifulSoup(p.text, 'lxml')
@@ -15,9 +21,12 @@ def scrapPagina(url, marca):
         re4=re2.find('div', attrs={'class': 'ui-search-item__group ui-search-item__group--title'})
         if re3!=None and marca.upper() in re4.a.get('title').upper():
             cont+=1
+            productos.append(extraerDatosProducto(re2, re3, re4))
     return cont
 
-def scrapPaginas(url, marca, num):
+def scrap(url, marca, num):
+    #Funcion que llama a la función scrapPaginas de acuerdo a la cantidas de paginas en las que se necesita realizar la busqueda desde el url indicado
+
     Totales=[]
     for i in range(num):
         #print(url)
@@ -30,59 +39,46 @@ def scrapPaginas(url, marca, num):
     return Totales
 
 
-url='https://listado.mercadolibre.com.ar/celular-smarphones#D[A:celular%20smarphones]'
-marca='Samsung'
-paginas=5
-#Totales=scrapPaginas(url, marca, paginas)
-#print(Totales)
-#print("La cantidad de productos encontrados de la marca ", marca, " que están en el Fulfillment, en los resultados de las ", paginas, " primeras paginas es: ", sum(Totales))
-
 #Almacenar los productos normalizados en una tabla de base de datos relacional a preferencia del desarrollador
 
-def almacenarProductos(url):
-    productos=[]
-    p=requests.get(url)
-    p.status_code
-    s= BeautifulSoup(p.text, 'lxml')
-    resultados=s.find('ol', attrs={'class': 'ui-search-layout ui-search-layout--stack'}).find_all('li', attrs={'class': 'ui-search-layout__item'})
-    for resultado in resultados:
-        re2=BeautifulSoup(str(resultado), 'lxml')
-        re3=re2.find('svg', attrs={'class': 'ui-search-icon ui-search-icon--full'})
-        re4=re2.find('div', attrs={'class': 'ui-search-item__group ui-search-item__group--title'})
-        re5=re2.find('span', attrs={'class': 'price-tag-symbol'})
-        re5_1=re2.find('span', attrs={'class': 'price-tag-fraction'})
-        re6=re2.find('span', attrs={'class': 'ui-search-reviews__amount'})
-        if re4.a.get('title'):
-            titulo=re4.a.get('title')
-        else:
-            titulo='Null'
+def extraerDatosProducto(re2, re3, re4):
+    #función que extrae los atributos normalizados de los productos 
+    #retorna los datos en formato JSON
+
+    re5=re2.find('span', attrs={'class': 'price-tag-symbol'})
+    re5_1=re2.find('span', attrs={'class': 'price-tag-fraction'})
+    re6=re2.find('span', attrs={'class': 'ui-search-reviews__amount'})
+    if re4.a.get('title'):
+        titulo=re4.a.get('title')
+        url=re4.a.get('href')
+    else:
+        titulo='Null'
             
-        if re5 and re5_1:
-            precio=re5.text+re5_1.text
-        else:
-            precio='Null'
+    if re5 and re5_1:
+        precio=re5.text+re5_1.text
+    else:
+        precio='Null'
         
-        if re6:
-            reviews=re6.text
-        else:
-            reviews='Null'
-        if re3!=None:
-            full='yes'
-        else:
-            full='no'
-        producto={
-            "Titulo": titulo,
-            "Precio": precio,
-            "Reviews": reviews,
-            "Fulfillment": full
-        }
-        productos.append(producto)
-    return productos
+    if re6:
+        reviews=re6.text
+    else:
+        reviews='Null'
+    if re3!=None:
+        full='yes'
+    else:
+        full='no'
+    producto={
+        "Titulo": titulo,
+        "Precio": precio,
+        "Reviews": reviews,
+        "Fulfillment": full,
+        "Url": url
+    }
+    return producto  
 
-productos=almacenarProductos('https://listado.mercadolibre.com.ar/celular-smarphones#D[A:celular%20smarphones]')
-print(productos)
 
-def productosBD(productos):
+def almacenarProductosBD(productos):
+    #funcion que almacena los productos en la base de datos
     import pymysql
 
     connection= pymysql.connect(
@@ -95,8 +91,17 @@ def productosBD(productos):
     cursor= connection.cursor()
 
     for producto in productos:
-        sql=sql="INSERT INTO productos(Titulo, Precio, Reviews) VALUES('"+producto['Titulo']+"', '"+producto['Precio']+"', '"+producto['Reviews']+"')"
+        sql=sql="INSERT INTO productos(Titulo, Precio, Reviews, Fulfillment, Url) VALUES('"+producto['Titulo']+"', '"+producto['Precio']+"', '"+producto['Reviews']+"', '"+producto['Fulfillment']+"','"+producto['Url']+"')"
+        #print(str(sql))
         cursor.execute(str(sql))
         connection.commit()
 
-productosBD(productos)
+def ejecutarTodo():
+    url='https://listado.mercadolibre.com.ar/celular-smarphones#D[A:celular%20smarphones]'
+    marca='Samsung'
+    paginas=5
+    Totales=scrap(url, marca, paginas)
+    print("La cantidad de productos encontrados de la marca ", marca, " que están en el Fulfillment, en los resultados de las ", paginas, " primeras paginas es: ", sum(Totales))
+    almacenarProductosBD(productos)
+
+ejecutarTodo()
