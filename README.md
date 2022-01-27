@@ -19,7 +19,10 @@ Start MySQL in xampp
 Open Terminal and run the following instructions:
 ```
 mysql -u root -p
-Enter Password:
+```
+Enter Password
+
+```
 mysql>create database if not exists productos_prueba;
 mysql>use productos_prueba;
 mysql>$ CREATE TABLE `productos` (  `Id` int(11) NOT NULL AUTO_INCREMENT,  `Titulo` varchar(255) NOT NULL,  `Precio` varchar(255) NOT NULL,  `Reviews` varchar(100) NOT NULL,  `Fulfillment` varchar(100) DEFAULT NULL,  `Url` text,  PRIMARY KEY (`Id`));</code>
