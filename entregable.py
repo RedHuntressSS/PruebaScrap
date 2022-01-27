@@ -43,7 +43,7 @@ def scrap(url, marca, num):
 
 def extraerDatosProducto(re2, re3, re4):
     #función que extrae los atributos normalizados de los productos 
-    #retorna los datos en formato JSON
+    #retorna los datos de un producto en formato JSON
 
     re5=re2.find('span', attrs={'class': 'price-tag-symbol'})
     re5_1=re2.find('span', attrs={'class': 'price-tag-fraction'})
@@ -57,8 +57,7 @@ def extraerDatosProducto(re2, re3, re4):
     if re5 and re5_1:
         precio=re5.text+re5_1.text
     else:
-        precio='Null'
-        
+        precio='Null'       
     if re6:
         reviews=re6.text
     else:
@@ -84,7 +83,8 @@ def almacenarProductosBD(productos):
     connection= pymysql.connect(
         host='localhost',
         user='root',
-        password='LSVG1531',
+        port='',
+        password='',#Escriba aqui su contraseña en caso de ser necesario
         db='productos_prueba'
     )
 
@@ -96,7 +96,7 @@ def almacenarProductosBD(productos):
         cursor.execute(str(sql))
         connection.commit()
 
-def ejecutarTodo():
+def main():
     url='https://listado.mercadolibre.com.ar/celular-smarphones#D[A:celular%20smarphones]'
     marca='Samsung'
     paginas=5
@@ -104,4 +104,4 @@ def ejecutarTodo():
     print("La cantidad de productos encontrados de la marca ", marca, " que están en el Fulfillment, en los resultados de las ", paginas, " primeras paginas es: ", sum(Totales))
     almacenarProductosBD(productos)
 
-ejecutarTodo()
+main()
