@@ -40,6 +40,7 @@ py -m pip install bs4
 py -m pip install request
 py -m pip install lxml
 py -m pip install PyMySQL
+py -m pip install pytest
 ```
 
 MacOS:
@@ -50,6 +51,7 @@ python3 -m pip install bs4
 python3 -m pip install request
 python3 -m pip install lxml
 python3 -m pip install PyMySQL
+python3 -m pip install pytest
 ```
 
 ### 3) Execute
