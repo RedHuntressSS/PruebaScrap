@@ -7,9 +7,13 @@ import requests
 productos=[]
 
 def scrapPagina(url, marca):
-    #función que realiza el scrap de la url indicada en busqueda de los articulos de la marca especificada que estan en Fulfillment
-    #Retorna el numero de productos encontrados y los almacena en la lista productos
-
+    """
+    función que realiza el scrap de la url indicada en busqueda de los articulos de la marca especificada que estan en Fulfillment almacenandolos en la lista productos
+    Args:
+       url (string): Dirección url de la pagina web que se desea scrapear
+       marca (string):  Marca de los productos de interes
+    Return: número de productos encontrados
+    """
     p=requests.get(url)
     p.status_code
     s= BeautifulSoup(p.text, 'lxml')
@@ -26,8 +30,14 @@ def scrapPagina(url, marca):
     return cont
 
 def scrap(url, marca, num):
-    #Funcion que llama a la función scrapPaginas de acuerdo a la cantidas de paginas en las que se necesita realizar la busqueda desde el url indicado
-
+    """
+    Funcion que llama a la función scrapPaginas de acuerdo a la cantidas de paginas en las que se necesita realizar la busqueda desde el url indicado
+    Args:
+       url (string): Dirección url de la pagina web inicial que se desea scrapear
+       marca (string):  Marca de los productos de interes
+       num (int): Cantidad de paginas que se desea scrappear
+    Return: lista de los resultados del scrap de cada página
+    """
     Totales=[]
     for i in range(num):
         #print(url)
@@ -43,8 +53,16 @@ def scrap(url, marca, num):
 #Almacenar los productos normalizados en una tabla de base de datos relacional a preferencia del desarrollador
 
 def extraerDatosProducto(re2, full, titulo):
-    #función que extrae los atributos normalizados de los productos 
-    #retorna los datos de un producto en formato JSON
+    """
+    función que extrae los atributos normalizados de los productos
+    Args:
+       re2 (BeautifulSoup): Objeto que contiene la información que se desea extraer
+       full (string):  'yes' o 'no' dependiendo si el producto está en el fulfillment
+       titulo (strin): titulo o nombre del producto
+    Return: 
+        producto (JSON) : los datos de un producto en formato JSON
+    """
+
     re5=re2.find('span', attrs={'class': 'price-tag-symbol'})
     re5_1=re2.find('span', attrs={'class': 'price-tag-fraction'})
     re6=re2.find('span', attrs={'class': 'ui-search-reviews__amount'})
@@ -68,7 +86,13 @@ def extraerDatosProducto(re2, full, titulo):
 
 
 def almacenarProductosBD(productos):
-    #funcion que almacena los productos en la base de datos
+    """
+    funcion que almacena los productos en la base de datos
+    Args:
+       productos (list): lista de los objetos JSON que se requieren enviar a base de datos
+    Return: 
+        la cantidad de registros efectivamente realizados
+    """
     import pymysql
 
     connection= pymysql.connect(
@@ -99,6 +123,7 @@ def almacenarProductosBD(productos):
     return r2-r1
 
 def main():
+    #los parametros url, marca y paginas se pueden cambiar segun la necesidad
     url='https://listado.mercadolibre.com.ar/celular-smarphones#D[A:celular%20smarphones]'
     marca='Samsung'
     paginas=5
