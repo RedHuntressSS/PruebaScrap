@@ -56,6 +56,8 @@ python3 -m pip install pytest
 
 ### 3) Execute
 
+Note: check lines of code 98-104 to confirm that the connection parameters correspond 
+
 Navigate to the project folder via terminal and run the following instructions:
 
 ```python entregable.py```
