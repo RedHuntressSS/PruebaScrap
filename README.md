@@ -77,7 +77,15 @@ Example of result:
 
 ![image](https://user-images.githubusercontent.com/98436887/151436725-b7deb3be-d3e3-4ec8-af51-61366bbf4e9b.png)
 
+### 4) Testing
 
-
+Navigate to the project folder via terminal and run the following instructions:
+```
+pytest
+```
+or (for more specific information)
+```
+pytest -v
+```
 
 
