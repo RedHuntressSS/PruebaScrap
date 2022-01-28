@@ -19,7 +19,10 @@ Start MySQL in xampp
 Open Terminal and run the following instructions:
 ```
 mysql -u root -p
-Enter Password:
+```
+Enter Password
+
+```
 mysql>create database if not exists productos_prueba;
 mysql>use productos_prueba;
 mysql>$ CREATE TABLE `productos` (  `Id` int(11) NOT NULL AUTO_INCREMENT,  `Titulo` varchar(255) NOT NULL,  `Precio` varchar(255) NOT NULL,  `Reviews` varchar(100) NOT NULL,  `Fulfillment` varchar(100) DEFAULT NULL,  `Url` text,  PRIMARY KEY (`Id`));</code>
@@ -60,13 +63,13 @@ Now you can see all the products in your database:
 terminal
 ```
 mysql -u root -p
-*enter password*
+Enter password:
 use productos_prueba;
 select * from productos; 
 ```
 or this to better see the results:
 ```
-select Titulo Titulo, Precio, Reviews from productos; //to better see the results 
+select Titulo, Precio, Reviews from productos; //to better see the results;
 ```
 Example of result:
 
