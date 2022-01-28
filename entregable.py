@@ -19,9 +19,10 @@ def scrapPagina(url, marca):
         re2=BeautifulSoup(str(resultado), 'lxml')
         re3=re2.find('svg', attrs={'class': 'ui-search-icon ui-search-icon--full'})
         re4=re2.find('div', attrs={'class': 'ui-search-item__group ui-search-item__group--title'})
-        if re3!=None and marca.upper() in re4.a.get('title').upper():
+        titulo=re4.a.get('title')
+        if re3!=None and marca.upper() in titulo.upper():
             cont+=1
-            productos.append(extraerDatosProducto(re2, re3, re4))
+            productos.append(extraerDatosProducto(re2, 'yes', titulo))
     return cont
 
 def scrap(url, marca, num):
@@ -41,19 +42,13 @@ def scrap(url, marca, num):
 
 #Almacenar los productos normalizados en una tabla de base de datos relacional a preferencia del desarrollador
 
-def extraerDatosProducto(re2, re3, re4):
+def extraerDatosProducto(re2, full, titulo):
     #función que extrae los atributos normalizados de los productos 
     #retorna los datos de un producto en formato JSON
-
     re5=re2.find('span', attrs={'class': 'price-tag-symbol'})
     re5_1=re2.find('span', attrs={'class': 'price-tag-fraction'})
     re6=re2.find('span', attrs={'class': 'ui-search-reviews__amount'})
-    if re4.a.get('title'):
-        titulo=re4.a.get('title')
-        url=re4.a.get('href')
-    else:
-        titulo='Null'
-            
+    url=re2.a.get('href')           
     if re5 and re5_1:
         precio=re5.text+re5_1.text
     else:
@@ -62,10 +57,6 @@ def extraerDatosProducto(re2, re3, re4):
         reviews=re6.text
     else:
         reviews='Null'
-    if re3!=None:
-        full='yes'
-    else:
-        full='no'
     producto={
         "Titulo": titulo,
         "Precio": precio,
@@ -84,17 +75,28 @@ def almacenarProductosBD(productos):
         host='localhost',
         user='root',
         port='',
-        password='',#Escriba aqui su contraseña en caso de ser necesario
+        password='LSVG1531',#Escriba aqui su contraseña en caso de ser necesario
         db='productos_prueba'
     )
 
     cursor= connection.cursor()
+
+    sqlRegistros="select count(*) from productos"
+    cursor.execute(sqlRegistros)
+    registros=cursor.fetchone()
+    r1=int(registros[0])
 
     for producto in productos:
         sql=sql="INSERT INTO productos(Titulo, Precio, Reviews, Fulfillment, Url) VALUES('"+producto['Titulo']+"', '"+producto['Precio']+"', '"+producto['Reviews']+"', '"+producto['Fulfillment']+"','"+producto['Url']+"')"
         #print(str(sql))
         cursor.execute(str(sql))
         connection.commit()
+
+    cursor.execute(sqlRegistros)
+    registros=cursor.fetchone()
+    r2=int(registros[0])
+
+    return r2-r1
 
 def main():
     url='https://listado.mercadolibre.com.ar/celular-smarphones#D[A:celular%20smarphones]'
