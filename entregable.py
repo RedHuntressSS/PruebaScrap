@@ -99,7 +99,7 @@ def almacenarProductosBD(productos):
         host='localhost',
         user='root',
         port='',
-        password='LSVG1531',#Escriba aqui su contraseña en caso de ser necesario
+        password='',#Escriba aqui su contraseña en caso de ser necesario
         db='productos_prueba'
     )
 
